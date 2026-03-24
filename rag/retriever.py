@@ -3,6 +3,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 from langchain_community.chat_models import ChatOllama 
 from langchain_core.prompts import PromptTemplate
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # ---------------------------------------------------------
 # 1. SETUP LOCAL OLLAMA LLM (MISTRAL)
@@ -81,3 +82,15 @@ def generate_rag_answer(query: str) -> dict:
         "answer": response.content,
         "chunks_used": len(chunks)
     }
+
+def ingest_new_text(text: str, filename: str) -> int:
+    """Chunks a newly uploaded text file and adds it to the existing ChromaDB."""
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+    chunks = text_splitter.split_text(text)
+    
+    # Add metadata so we know where it came from
+    metadatas = [{"source": filename, "section": "User Uploaded"} for _ in chunks]
+    
+    # Add to the existing vector store
+    vector_store.add_texts(texts=chunks, metadatas=metadatas)
+    return len(chunks)

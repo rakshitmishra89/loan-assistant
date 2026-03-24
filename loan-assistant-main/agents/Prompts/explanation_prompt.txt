@@ -1,9 +1,0 @@
-Explain the loan decision in simple terms for the user.
-
-Be clear and friendly.
-Mention:
-- EMI
-- Risk
-- Income
-
-Do not use technical jargon.

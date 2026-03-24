@@ -27,6 +27,14 @@ def render_tool_results(tools: dict):
         return
         
     st.markdown("### 🧮 Tool Results")
+    
+    # NEW: Display Eligibility Check
+    if tools.get("is_eligible"):
+        st.success("✅ **Eligibility:** Passed basic checks.")
+    else:
+        st.error(f"❌ **Eligibility Failed:** {', '.join(tools.get('eligibility_reasons', []))}")
+        
+    # Display Financial Math
     col1, col2, col3 = st.columns(3)
     col1.metric("Calculated EMI", f"${tools.get('emi', 0):.2f}")
     col2.metric("EMI Burden", f"{tools.get('emi_burden_pct', 0):.1f}%")

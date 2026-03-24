@@ -24,16 +24,31 @@ with st.sidebar:
     # Display the structured data we've collected so far
     if st.session_state.collected_inputs:
         for key, value in st.session_state.collected_inputs.items():
-            st.text_input(key.replace("_", " ").title(), value=str(value) if value else "Pending...", disabled=True)
+            # Check explicitly for None so it shows "Pending..." correctly
+            display_val = str(value) if value is not None else "Pending..."
+            st.text_input(key.replace("_", " ").title(), value=display_val, disabled=True)
     else:
         st.info("No data collected yet. Start chatting!")
         
     st.divider()
     
     st.header("Upload Documents")
-    uploaded_file = st.file_uploader("Upload Policy or Financial Docs", type=["pdf", "txt"])
+    uploaded_file = st.file_uploader("Upload Policy or Financial Docs", type=["txt"])
     if uploaded_file:
-        st.success("File ready for processing (Mocked)")
+        if st.button("Process Document"):
+            with st.spinner("Ingesting into Vector Database..."):
+                try:
+                    # Send the file to FastAPI
+                    files = {"file": (uploaded_file.name, uploaded_file.getvalue(), "text/plain")}
+                    upload_res = requests.post(f"{API_URL}/upload", files=files)
+                    
+                    if upload_res.status_code == 200:
+                        data = upload_res.json()
+                        st.success(f"✅ Successfully learned '{data['filename']}' ({data['chunks_added']} chunks added!)")
+                    else:
+                        st.error("Upload failed.")
+                except Exception as e:
+                    st.error(f"Error connecting to backend: {e}")
         
     st.divider()
     
