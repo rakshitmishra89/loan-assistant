@@ -13,6 +13,7 @@ def process(user_message: str, tool_results: dict, rag_data: dict, chat_history:
     Bank Policies: {rag}
     
     Write a polite, professional response explaining the outcome. 
+    IMPORTANT: You must format ALL monetary values in Indian Rupees (₹), never use Dollars.
     Look carefully at the Financial Math Results. 
     If 'is_eligible' is False OR the 'risk_band' is HIGH, you MUST decline the loan and explain the specific reason why. 
     If 'is_eligible' is True AND the 'risk_band' is LOW or MEDIUM, you may approve it.
@@ -20,6 +21,7 @@ def process(user_message: str, tool_results: dict, rag_data: dict, chat_history:
     
     chain = PromptTemplate.from_template(prompt) | llm
     reply = chain.invoke({
+        "history": chat_history,
         "message": user_message, 
         "tools": tool_results, 
         "rag": rag_data.get("chunks", [])

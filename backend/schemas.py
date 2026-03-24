@@ -26,6 +26,7 @@ class ToolResultsModel(BaseModel):
     emi_burden_pct: float = 0.0
     risk_band: str = "UNKNOWN"
     tenure_used: int = 36
+    principal: float = 0.0 
 
 class RagChunkModel(BaseModel):
     text: str

@@ -16,7 +16,8 @@ def process(user_message: str, current_state: dict) -> dict:
     "income_monthly": (number or null),
     "tenure_months": (number or null),
     "age": (number or null),
-    "missing_fields": (list of strings for what is still needed, e.g., ["income_monthly", "age"])
+    "credit_score": (number or null),
+    "missing_fields": (list of strings for what is still needed, e.g., ["income_monthly", "credit_score"])
     """
     
     chain = PromptTemplate.from_template(prompt) | llm
