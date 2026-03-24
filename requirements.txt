@@ -1,0 +1,25 @@
+# --- Frontend (UI & API Requests) ---
+streamlit>=1.30.0
+requests>=2.31.0
+
+# --- Backend (API & Data Validation) ---
+fastapi>=0.109.0
+uvicorn>=0.27.0
+python-multipart>=0.0.9  # Required for FastAPI file uploads
+pydantic>=2.5.0
+
+# --- AI, LLM & Orchestration (LangChain Ecosystem) ---
+langchain>=0.1.0
+langchain-core>=0.1.10
+langchain-community>=0.0.13
+langchain-text-splitters>=0.0.1
+langchain-huggingface>=0.0.1
+langchain-chroma>=0.1.0
+
+# --- Vector Database & Embeddings ---
+chromadb>=0.4.22
+sentence-transformers>=2.2.2  # Required for HuggingFace embeddings (all-MiniLM-L6-v2)
+
+# --- Evaluation & Jupyter (For your perf/evaluation notebooks) ---
+jupyter>=1.0.0
+notebook>=7.0.0

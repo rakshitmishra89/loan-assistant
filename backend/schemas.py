@@ -20,9 +20,12 @@ class DecisionModel(BaseModel):
     confidence: float = 0.0
 
 class ToolResultsModel(BaseModel):
+    is_eligible: bool = True
+    eligibility_reasons: List[str] = []
     emi: float = 0.0
     emi_burden_pct: float = 0.0
     risk_band: str = "UNKNOWN"
+    tenure_used: int = 36
 
 class RagChunkModel(BaseModel):
     text: str

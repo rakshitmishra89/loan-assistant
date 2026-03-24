@@ -2,99 +2,83 @@
 import time
 from backend.schemas import ChatResponse, DecisionModel, ToolResultsModel, RagMetadataModel, GuardrailsModel, LatencyModel
 from backend import memory_store
-from backend.adapters import guardrails_adapter, llm_adapter, rag_adapter, tools_adapter
+from backend.adapters import guardrails_adapter
+
+# Import our new Autonomous Agents
+from backend.agents import intake_agent, retrieval_agent, tool_agent, decision_agent
 
 async def handle_chat(session_id: str, message: str, metadata: dict = None) -> ChatResponse:
     t0 = time.time()
     agent_trace = []
     
-    # 1. Input Guardrails
+    # 1. SECURITY: Input Guardrails
     verdict_in = guardrails_adapter.moderate_input(message)
-    agent_trace.append({"step": "guardrails_input", "action": verdict_in["action"]})
-    
     if verdict_in["action"] == "BLOCK":
-        return _build_safe_response(session_id, "I'm sorry, I cannot process that request due to content policy.", verdict_in, t0)
-
+        return _build_safe_response(session_id, "I cannot process that request due to content policy.", verdict_in, t0)
     safe_message = verdict_in.get("redacted_text", message)
 
-    # 2. Load Memory
+    # 2. MEMORY: Load what we know about the user
     state = memory_store.load(session_id)
-    agent_trace.append({"step": "memory_loaded", "status": "success"})
 
-    # 3. Dummy Entity Extraction (You will replace this with an LLM call)
-    # TODO: Use LLM to extract fields from safe_message and update state["entities"]
+    # ---------------------------------------------------------
+    # AUTONOMOUS AGENT WORKFLOW STARTS HERE
+    # ---------------------------------------------------------
     
-    missing_fields = [k for k, v in state["entities"].items() if v is None]
+    # AGENT 1: INTAKE AGENT (Extracts data)
+    extracted_data = intake_agent.process(safe_message, state["entities"])
+    
+    # Update memory with what the Intake Agent found
+    if extracted_data.get("loan_amount"): state["entities"]["loan_amount"] = extracted_data["loan_amount"]
+    if extracted_data.get("income_monthly"): state["entities"]["income_monthly"] = extracted_data["income_monthly"]
+    if extracted_data.get("tenure_months"): state["entities"]["tenure_months"] = extracted_data["tenure_months"]
+    if extracted_data.get("age"): state["entities"]["age"] = extracted_data["age"]
+    
+    # If the Intake Agent says we are missing data, STOP and ask the user for it
+    if extracted_data.get("missing_fields"):
+        reply = f"To process your request, I still need your: {', '.join(extracted_data['missing_fields'])}."
+        decision = DecisionModel(status="NEED_MORE_INFO")
+        return _build_response(session_id, reply, decision, ToolResultsModel(), RagMetadataModel(), verdict_in, state, t0)
 
-    # 4. Supervisor Router Logic
-    rag_metadata = RagMetadataModel()
-    tool_results = ToolResultsModel()
-    decision = DecisionModel()
+    # AGENT 2: RETRIEVAL AGENT (Searches policies)
     t_retrieval_start = time.time()
+    rag_data = retrieval_agent.process(safe_message)
+    rag_model = RagMetadataModel(used=rag_data["used_rag"], top_k=len(rag_data["chunks"]), chunks=rag_data["chunks"])
+    
+    # AGENT 3: TOOL AGENT (Does the math)
+    tool_results_dict = tool_agent.process(state["entities"])
+    tool_model = ToolResultsModel(**tool_results_dict)
 
-    if missing_fields:
-        # ROUTE A: Need More Info (Intake Agent)
-        agent_trace.append({"step": "router", "decision": "INTAKE"})
-        reply = f"To help you with your loan, I still need: {', '.join(missing_fields)}."
-        decision.status = "NEED_MORE_INFO"
-        t_llm = time.time() - t_retrieval_start 
-        t_ret = 0.0
+    # AGENT 4: DECISION AGENT (Makes the final call)
+    chat_history = state.get("summary", "No history yet.")
+    reply, decision_dict = decision_agent.process(safe_message, tool_results_dict, rag_data, chat_history)
+    decision_model = DecisionModel(**decision_dict)
 
-    elif "policy" in safe_message.lower() or "rule" in safe_message.lower():
-        # ROUTE B: Policy Question (RAG)
-        agent_trace.append({"step": "router", "decision": "RAG_QA"})
-        raw_chunks = rag_adapter.retrieve(safe_message, k=4)
-        t_ret = time.time() - t_retrieval_start
-        
-        rag_metadata = RagMetadataModel(used=True, top_k=len(raw_chunks), chunks=raw_chunks)
-        reply = llm_adapter.answer_with_citations(safe_message, raw_chunks, state)
-        t_llm = time.time() - (t_retrieval_start + t_ret)
+    # ---------------------------------------------------------
+    # AUTONOMOUS AGENT WORKFLOW ENDS HERE
+    # ---------------------------------------------------------
 
-    else:
-        # ROUTE C: Decision & Tools
-        agent_trace.append({"step": "router", "decision": "TOOLS_EVALUATION"})
-        t_ret = 0.0
-        t_llm_start = time.time()
-        
-        raw_tools = tools_adapter.run_all(state["entities"])
-        tool_results = ToolResultsModel(**raw_tools)
-        
-        reply, decision_dict = llm_adapter.decide_and_explain(state, raw_tools)
-        decision = DecisionModel(**decision_dict)
-        t_llm = time.time() - t_llm_start
-
-    # 5. Output Guardrails
+    # 3. SECURITY: Output Guardrails
     verdict_out = guardrails_adapter.moderate_output(reply)
     if verdict_out["action"] != "ALLOW":
         reply = verdict_out.get("safe_text", "Output redacted for safety.")
 
-    # 6. Save Memory
-    memory_store.save(session_id, state, summary_update=True)
+    # 4. MEMORY: Save updated state WITH the messages so it can write the summary!
+    memory_store.save(session_id, state, safe_message, reply)
 
-    # 7. Construct Final Response
-    t_total = time.time() - t0
-    
+    return _build_response(session_id, reply, decision_model, tool_model, rag_model, verdict_in, state, t0, verdict_out)
+
+def _build_response(session_id, reply, decision, tool_model, rag_model, verdict_in, state, t0, verdict_out=None):
+    if not verdict_out: verdict_out = {"action": "ALLOW", "categories": []}
     return ChatResponse(
-        session_id=session_id,
-        reply=reply,
-        decision=decision,
-        collected_inputs=state["entities"],
-        tool_results=tool_results,
-        rag=rag_metadata,
+        session_id=session_id, reply=reply, decision=decision, collected_inputs=state["entities"],
+        tool_results=tool_model, rag=rag_model,
         guardrails=GuardrailsModel(input_action=verdict_in["action"], output_action=verdict_out["action"], categories=verdict_in.get("categories", [])),
-        agent_trace=agent_trace,
-        latency_ms=LatencyModel(retrieval=round(t_ret*1000, 2), llm=round(t_llm*1000, 2), end_to_end=round(t_total*1000, 2))
+        latency_ms=LatencyModel(end_to_end=round((time.time() - t0)*1000, 2))
     )
 
 def _build_safe_response(session_id, reply, verdict, t0):
-    """Helper to return a fast, safe response if guardrails block input."""
-    t_total = time.time() - t0
     return ChatResponse(
-        session_id=session_id,
-        reply=reply,
-        decision=DecisionModel(),
-        tool_results=ToolResultsModel(),
-        rag=RagMetadataModel(),
+        session_id=session_id, reply=reply, decision=DecisionModel(), tool_results=ToolResultsModel(), rag=RagMetadataModel(),
         guardrails=GuardrailsModel(input_action=verdict["action"], categories=verdict.get("categories", [])),
-        latency_ms=LatencyModel(end_to_end=round(t_total*1000, 2))
+        latency_ms=LatencyModel(end_to_end=round((time.time() - t0)*1000, 2))
     )
