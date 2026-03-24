@@ -1,0 +1,85 @@
+# MASTER FINANCIAL POLICY AND KNOWLEDGE BASE v2.4
+
+## 1. PERSONAL LOAN POLICIES AND TIERS
+
+### 1.1 Standard Personal Loan
+- Purpose: General use, including home renovation, wedding, travel, and medical emergencies.
+- Loan Limits: Minimum borrowing amount is $1,000. Maximum borrowing amount is $25,000.
+- Interest Rates: Fixed rates ranging from 12.5% to 16.5% per annum, determined by the applicant's internal credit risk score.
+- Tenure Options: Flexible repayment terms from 12 months up to 48 months.
+- Processing Fees: A non-refundable processing fee of 2.5% of the total loan amount (minimum $50) is deducted from the disbursed amount.
+- Foreclosure Policy: Borrowers may only foreclose the loan after successfully paying the first 6 EMIs. A foreclosure penalty of 4% on the principal outstanding will be applied. Partial prepayments are not allowed in the Standard tier.
+
+### 1.2 Premium Personal Loan
+- Purpose: High-net-worth individuals requiring larger capital for investments or major expenses.
+- Loan Limits: Minimum $25,001. Maximum $150,000.
+- Interest Rates: Highly competitive rates ranging from 9.0% to 11.5% per annum.
+- Tenure Options: 12 months to 72 months.
+- Processing Fees: Flat fee of $199, regardless of the loan amount.
+- Foreclosure Policy: Premium borrowers enjoy zero-fee foreclosure at any time during the loan tenure. Partial prepayments are allowed twice a year without any penalty.
+
+## 2. CREDIT CARD PRODUCTS AND BENEFITS
+
+### 2.1 Everyday Value Credit Card
+- Annual Fee: $25. This fee is automatically waived if the customer's annual spend exceeds $2,500 in the previous billing cycle.
+- Interest Rate: 3.5% per month on unpaid balances (Annualized Percentage Rate of 42%).
+- Default Credit Limit: Starts at $1,000, subject to periodic review based on repayment history.
+- Core Benefit: 1% flat cashback on all offline grocery and utility bill payments.
+
+### 2.2 super.money Pro Credit Card
+- Annual Fee: $99 (Non-waivable).
+- Target Audience: High-frequency online shoppers, digital natives, and lifestyle customers.
+- Special Partner Offers: The super.money Pro card provides a guaranteed 5% instant discount on all electronics, apparel, and lifestyle purchases made on partner platforms, specifically Flipkart and Myntra.
+- Milestone Benefit: Cardholders unlock a bonus of 10,000 reward points upon crossing $5,000 in cumulative spending within the first 90 days of card issuance.
+- Travel Benefits: Includes a complimentary Priority Pass membership with 4 free domestic airport lounge visits per calendar year.
+- Foreign Currency Markup: Reduced markup fee of 1.5% on international transactions.
+
+## 3. ELIGIBILITY CRITERIA AND UNDERWRITING RULES
+
+### 3.1 Age and Demographic Requirements
+- Minimum Age: The primary applicant must be at least 21 years old at the time of application submission.
+- Maximum Age: The applicant must not be older than 60 years of age (for salaried) or 65 years of age (for self-employed) at the time of loan maturity.
+
+### 3.2 Income and Employment Mandates
+- Salaried Employees: Must demonstrate a minimum net monthly take-home salary of $3,500. The applicant must have been employed with their current employer for at least 6 months, with a total work experience of 2 years.
+- Self-Employed Individuals: Must provide proof of business existence for at least 3 years. Required to show a minimum annual verified gross income of $60,000 via audited tax returns for the last two consecutive financial years.
+- Debt-to-Income (DTI) Ratio: The automated underwriting system will reject any application where the applicant's total monthly debt obligations (including the proposed new EMI) exceed 45% of their gross monthly income.
+
+### 3.3 Credit Score (CIBIL) Thresholds
+- Excellent (750 - 900): Pre-approved for Premium Loans and super.money Pro cards. Lowest interest rate brackets applied.
+- Good (650 - 749): Eligible for Standard Loans and Everyday Value cards. Standard interest rates apply.
+- Reject (< 650): Automatic system rejection. Applicants with a score below 650, or those with a "Written Off" or "Settled" status on any previous loan within the last 36 months, are strictly ineligible.
+
+### 3.4 Know Your Customer (KYC) Documentation
+- Identity Proof (OVD): Valid Passport, National ID card, or Driver's License.
+- Address Proof: Utility bill (electricity, water, or piped gas) or a broadband internet bill. The document must not be older than 60 days from the date of application.
+- Income Proof: The last 3 months of official bank statements showing salary credits, and the most recent pay slip.
+
+## 4. PENALTIES, FEES, AND ESCALATION MATRIX
+
+### 4.1 Default and Late Payment Penalties
+- Late Payment Fee: A flat fee of $35 is levied if an EMI payment is not received by the 5th calendar day past the scheduled due date.
+- Penal Interest: An additional penalty interest of 2% per month will be charged strictly on the overdue principal amount until the arrears are cleared.
+- Bounce Charges: If an auto-debit (ACH/Mandate) fails due to insufficient funds, a bounce charge of $20 per instance will be applied to the account.
+
+### 4.2 Customer Grievance and Escalation Matrix
+- Level 1 (Primary Support): Customers must first raise a ticket via the AI Chat Assistant or email support@loanassist.com. The standard Service Level Agreement (SLA) for resolution is 48 business hours.
+- Level 2 (Grievance Officer): If the issue remains unresolved after 48 hours, or the customer is dissatisfied with the outcome, they may escalate to grievance@loanassist.com. The SLA at this level is 5 business days.
+- Level 3 (Regulatory Escalation): If no satisfactory resolution is provided within 30 days of the initial complaint, the customer retains the right to escalate the matter externally to the regional Banking Ombudsman.
+
+## 5. FREQUENTLY ASKED QUESTIONS (FAQ)
+
+Q: How long does the automated approval process take?
+A: Once all required KYC documents are successfully uploaded and parsed by the OCR system, our underwriting engine typically provides a final approval decision within 15 minutes. Upon signing the digital agreement, funds are disbursed directly to the verified bank account within 24 hours.
+
+Q: Can I change my EMI due date after the loan is disbursed?
+A: Yes, borrowers are permitted to change their EMI due date exactly one time during the entire lifetime of the loan. This request must be submitted through the portal at least 15 days prior to the currently scheduled due date.
+
+Q: How exactly is my monthly EMI calculated?
+A: We use the standard reducing balance method. The automated calculation utilizes the principal loan amount, the agreed-upon annual interest rate (which is divided by 12 to find the monthly rate), and the total number of months in your chosen repayment tenure.
+
+Q: How do enterprise partners manage API access for the B2B portal?
+A: Enterprise IT administrators must securely generate and store their authentication keys. For security purposes, if a key limit is reached or if there is any suspicion that a key has been compromised, administrators should log into the developer dashboard and delete all existing API keys in one go. They must then generate a fresh batch of keys and update their environment variables accordingly.
+
+Q: Is my financial data and uploaded documentation secure?
+A: Absolutely. All applicant data, including bank statements and identity documents, are encrypted at rest using the AES-256 standard. Data in transit is secured via TLS 1.3. We maintain strict compliance with data protection regulations and never sell applicant data to third-party marketers.
