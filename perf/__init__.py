@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # perf/__init__.py
 """
 Performance utilities for the Loan Assistant.
@@ -31,6 +30,3 @@ __all__ = [
     "setup_inmemory_cache",
     "setup_sqlite_cache",
 ]
-=======
-# perf package
->>>>>>> 0bc0fbb9e046b7272719db153b92df3a456642a2
