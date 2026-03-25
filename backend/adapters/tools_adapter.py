@@ -12,13 +12,15 @@ def run_all(state_entities: dict) -> dict:
         tenure = int(state_entities.get("tenure_months") or 36)
         age = int(state_entities.get("age") or 0)
         credit_score = int(state_entities.get("credit_score") or 0)
+        interest_rate = float(state_entities.get("interest_rate") or 12.5)  # Use provided rate or default
     except (ValueError, TypeError):
         # Fallback for invalid numeric data types
         return {
             "is_eligible": False, 
             "eligibility_reasons": ["Invalid data format detected in application."], 
             "emi": 0.0, 
-            "risk_band": "HIGH"
+            "risk_band": "HIGH",
+            "interest_rate_used": 12.5
         }
 
     # ---------------------------------------------------------
@@ -32,8 +34,8 @@ def run_all(state_entities: dict) -> dict:
     # ---------------------------------------------------------
     # 3. EXECUTE TOOL 2: EMI Calculator
     # ---------------------------------------------------------
-    # Standard reducing balance calculation at 12.5%
-    emi = emi_calculator.calculate(loan_amount, 12.5, tenure) if loan_amount > 0 else 0.0
+    # Use the interest rate from user input or default to 12.5%
+    emi = emi_calculator.calculate(loan_amount, interest_rate, tenure) if loan_amount > 0 else 0.0
     
     # ---------------------------------------------------------
     # 4. EXECUTE TOOL 3: Risk Scoring
@@ -52,5 +54,6 @@ def run_all(state_entities: dict) -> dict:
         "emi_burden_pct": round(emi_burden_pct, 1),
         "risk_band": risk,
         "tenure_used": tenure,
-        "principal": loan_amount
+        "principal": loan_amount,
+        "interest_rate_used": interest_rate
     }

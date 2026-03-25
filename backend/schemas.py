@@ -15,7 +15,18 @@ class RagQueryRequest(BaseModel):
 
 # --- Nested Response Models ---
 class DecisionModel(BaseModel):
-    status: str = "NEED_MORE_INFO" # APPROVE|REJECT|MANUAL_REVIEW|NEED_MORE_INFO
+    # Status options:
+    # - APPROVE: Loan application approved
+    # - REJECT: Loan application rejected
+    # - MANUAL_REVIEW: Needs human review
+    # - NEED_MORE_INFO: Missing required financial data
+    # - INFO_PROVIDED: Policy/information question answered (RAG response)
+    # - GREETING: General greeting/help response
+    # - PENDING: Awaiting complete information
+    # - CALCULATION_COMPLETE: EMI or other calculation completed successfully
+    # - OFF_TOPIC: Message not related to financial/loan services
+    # - BLOCKED: Message blocked by guardrails (security threat, harmful content)
+    status: str = "NEED_MORE_INFO"
     reasoning: List[str] = []
     confidence: float = 0.0
 
@@ -26,7 +37,8 @@ class ToolResultsModel(BaseModel):
     emi_burden_pct: float = 0.0
     risk_band: str = "UNKNOWN"
     tenure_used: int = 36
-    principal: float = 0.0 
+    principal: float = 0.0
+    interest_rate_used: float = 12.5 
 
 class RagChunkModel(BaseModel):
     text: str

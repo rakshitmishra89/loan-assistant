@@ -1,5 +1,5 @@
 def check_basic_eligibility(age: int, income_monthly: float) -> dict:
-    """Checks basic bank policy rules: Age 21-60, Min Income $3500"""
+    """Checks basic bank policy rules: Age 21-60, Min Income Rs. 35,000"""
     is_eligible = True
     reasons = []
 
@@ -7,8 +7,8 @@ def check_basic_eligibility(age: int, income_monthly: float) -> dict:
         is_eligible = False
         reasons.append("Applicant age must be between 21 and 60.")
         
-    if income_monthly and income_monthly < 3500:
+    if income_monthly and income_monthly < 35000:
         is_eligible = False
-        reasons.append("Minimum monthly income must be $3,500.")
+        reasons.append("Minimum monthly income must be Rs. 35,000.")
         
     return {"eligible": is_eligible, "reasons": reasons}

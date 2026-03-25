@@ -16,6 +16,12 @@ def render_decision_card(decision: dict):
         st.success(f"**Status: {status}** (Confidence: {confidence*100:.0f}%)")
     elif status == "REJECT":
         st.error(f"**Status: {status}** (Confidence: {confidence*100:.0f}%)")
+    elif status == "CALCULATION_COMPLETE":
+        st.info(f"**Status: Calculation Complete** (Confidence: {confidence*100:.0f}%)")
+    elif status == "INFO_PROVIDED":
+        st.info(f"**Status: Information Provided** (Confidence: {confidence*100:.0f}%)")
+    elif status == "GREETING":
+        return  # Don't show card for greetings
     else:
         st.warning(f"**Status: {status}** (Confidence: {confidence*100:.0f}%)")
 
@@ -36,10 +42,11 @@ def render_tool_results(tools: dict):
         st.error(f"❌ **Eligibility Failed:** {', '.join(tools.get('eligibility_reasons', []))}")
         
     # Financial Metrics (Rupee Localized)
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Calculated EMI", f"₹{tools.get('emi', 0):.2f}")
-    col2.metric("EMI Burden", f"{tools.get('emi_burden_pct', 0):.1f}%")
-    col3.metric("Risk Band", tools.get("risk_band", "UNKNOWN"))
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Calculated EMI", f"Rs. {tools.get('emi', 0):,.2f}")
+    col2.metric("Interest Rate", f"{tools.get('interest_rate_used', 12.5)}%")
+    col3.metric("EMI Burden", f"{tools.get('emi_burden_pct', 0):.1f}%")
+    col4.metric("Risk Band", tools.get("risk_band", "N/A"))
 
     # PHASE 3: Interactive Principal vs Interest Breakdown
     principal = tools.get("principal", 0)
